@@ -1,0 +1,62 @@
+# LAMP Stack Playbook for Amazon Linux
+# Components:
+# Apache Web Server  -> httpd
+# MariaDB Database   -> mariadb105-server
+# PHP Runtime        -> php, php-fpm
+
+---
+- name: install LAMP in Amazon Linux
+  hosts: localhost
+  become: yes
+
+  tasks:
+
+    # Install Apache HTTP Server
+    - name: Install httpd package
+      ansible.builtin.dnf:
+        name: httpd
+        state: present
+
+    # Install MariaDB Server
+    - name: Install mariadb package
+      ansible.builtin.dnf:
+        name: mariadb105-server
+        state: present
+
+    # Install PHP and PHP-FPM packages
+    - name: Install php package
+      ansible.builtin.dnf:
+        name:
+          - php
+          - php-fpm
+        state: present
+
+    # Start and enable Apache service
+    - name: start and enable httpd
+      ansible.builtin.systemd_service:
+        name: httpd
+        state: started
+        enabled: true
+
+    # Start and enable MariaDB service
+    - name: start and enable mariadb
+      ansible.builtin.systemd_service:
+        name: mariadb
+        state: started
+        enabled: true
+
+    # Start and enable PHP-FPM service
+    - name: start and enable php
+      ansible.builtin.systemd_service:
+        name: php-fpm
+        state: started
+        enabled: true
+
+    # Create a PHP test page
+    - name: deploy php
+      ansible.builtin.copy:
+        dest: /var/www/html/index.php
+        content: |
+          <?php
+          phpinfo();
+          ?>
